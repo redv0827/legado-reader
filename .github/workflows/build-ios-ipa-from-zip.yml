@@ -1,0 +1,65 @@
+name: Build IPA from zip
+
+# 适用场景：仓库根目录只有 LegadoReader-iOS.zip 和这个工作流文件，不需要 git 客户端。
+# 手动运行：Actions -> Build IPA from zip -> Run workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Unzip project
+        run: |
+          set -e
+          unzip -q LegadoReader-iOS.zip -d src
+          ls -la src
+          ls -la src/LegadoReader
+
+      - name: Build (unsigned)
+        run: |
+          set -e
+          cd src/LegadoReader
+          xcodebuild \
+            -project LegadoReader.xcodeproj \
+            -scheme LegadoReader \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            build
+
+      - name: Package IPA
+        run: |
+          set -e
+          APP="src/LegadoReader/build/Build/Products/Release-iphoneos/LegadoReader.app"
+          if [ ! -d "$APP" ]; then
+            echo "找不到构建产物：$APP"
+            ls -R src/LegadoReader/build/Build/Products || true
+            exit 1
+          fi
+          rm -rf Payload
+          mkdir -p Payload
+          cp -R "$APP" Payload/
+          zip -qry LegadoReader-unsigned.ipa Payload
+          ls -lh LegadoReader-unsigned.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: LegadoReader-unsigned-ipa
+          path: LegadoReader-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30
