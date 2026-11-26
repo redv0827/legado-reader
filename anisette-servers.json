@@ -1,0 +1,16 @@
+{
+  "servers": [
+    {
+      "name": "jkcoxson (Mac)",
+      "address": "https://mac-ani.jkcoxson.com"
+    },
+    {
+      "name": "SideStore new.ani",
+      "address": "https://new.ani.sidestore.io"
+    },
+    {
+      "name": "lillq (Mac)",
+      "address": "https://anisette.lillq.me"
+    }
+  ]
+}
