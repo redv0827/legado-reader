@@ -1,6 +1,6 @@
 name: Build IPA from zip
 
-# 适用场景：仓库根目录只有 LegadoReader-IOS.zip 和这个工作流文件，不需要 git 客户端。
+# 适用场景：仓库根目录只有 LegadoReader-iOS.zip 和这个工作流文件，不需要 git 客户端。
 # 手动运行：Actions -> Build IPA from zip -> Run workflow
 
 on:
@@ -20,7 +20,7 @@ jobs:
       - name: Unzip project
         run: |
           set -e
-          unzip -q LegadoReader-IOS.zip -d src
+          unzip -q LegadoReader-iOS.zip -d src
           ls -la src
           ls -la src/LegadoReader
 
